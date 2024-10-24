@@ -37,7 +37,11 @@ public enum ApiStatus {
 	ACCESS_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "ACT-001", "AccessToken not found."),
 	REFRESH_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "RFT-001", "RefreshToken not found."),
 	MEMBER_LOGIN_SESSION_EXPIRED(HttpStatus.BAD_REQUEST, "MSE-001", "Member login session expired."),
-	OAUTH_ATTRIBUTE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ATH-001", "Cannot find OAuth attribute.")
+	OAUTH_ATTRIBUTE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ATH-001", "Cannot find OAuth attribute."),
+
+	// 클라코 북 에러
+	CLACO_BOOK_NOT_FOUND(HttpStatus.BAD_REQUEST, "CLB-001", "Claco book not found."),
+	CLACO_BOOK_CREATION_LIMIT(HttpStatus.BAD_REQUEST, "CLB-010", "Claco Book can create maximum 5."),
 	;
 
 	private final HttpStatus httpStatus;

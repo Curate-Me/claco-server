@@ -52,4 +52,8 @@ public abstract class BaseEntity {
 		this.activeStatus = ActiveStatus.ACTIVE;
 	}
 
+	public void updateActiveStatus(ActiveStatus activeStatus) {
+		this.activeStatus = activeStatus;
+	}
+
 }

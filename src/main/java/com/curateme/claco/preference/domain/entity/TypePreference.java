@@ -1,5 +1,8 @@
 package com.curateme.claco.preference.domain.entity;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import com.curateme.claco.global.entity.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -23,12 +26,15 @@ import lombok.NoArgsConstructor;
  * DATE               AUTHOR        NOTE
  * -----------------------------------------------------------
  * 2024.10.22   	   이 건        최초 생성
+ * 2024.10.24   	   이 건        soft delete 조건 추가
  */
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE type_preference SET active_status = 'DELETED' WHERE type_preference_id = ?")
+@SQLRestriction("active_status <> 'DELETED'")
 public class TypePreference extends BaseEntity {
 
 	@Id
