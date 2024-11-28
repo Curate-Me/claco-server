@@ -27,7 +27,7 @@ public interface ConcertRepository extends JpaRepository<Concert,Long> {
         "WHERE (:query = 'all' OR c.prfnm LIKE %:query% " +
         "OR c.prfcast LIKE %:query% " +
         "OR c.fcltynm LIKE %:query%) " +
-        "AND c.prfpdto < CURRENT_DATE")
+        "AND c.prfpdto <= CURRENT_DATE")
     List<Long> findConcertIdsBySearchQueryV2(@Param("query") String query);
 
     @Query("SELECT c FROM Concert c WHERE c.id = :concertId")
@@ -39,13 +39,6 @@ public interface ConcertRepository extends JpaRepository<Concert,Long> {
         "OR c.fcltynm LIKE %:query%) " +
         "AND c.prfpdto >= CURRENT_DATE")
     Page<Concert> findBySearchQuery(@Param("query") String query, Pageable pageable);
-
-    @Query("SELECT c FROM Concert c " +
-        "WHERE (c.prfnm LIKE %:query% " +
-        "OR c.prfcast LIKE %:query% " +
-        "OR c.fcltynm LIKE %:query%) " +
-        "AND c.prfpdto < CURRENT_DATE")
-    Page<Concert> findBySearchQueryV2(@Param("query") String query, Pageable pageable);
 
     @Query("SELECT c FROM Concert c " +
         "LEFT JOIN c.categories cat " +
