@@ -63,9 +63,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 
-			// String refreshToken = jwtTokenUtil.extractRefreshToken(request).stream()
-			// 	.findAny()
-			// 	.orElseThrow(() -> new BusinessException(ApiStatus.REFRESH_TOKEN_NOT_FOUND));
+			String refreshToken = jwtTokenUtil.extractRefreshToken(request).stream()
+				.findAny()
+				.orElseThrow(() -> new BusinessException(ApiStatus.REFRESH_TOKEN_NOT_FOUND));
 
 			response.setHeader("Authorization", GRANT_TYPE + accessToken);
 
