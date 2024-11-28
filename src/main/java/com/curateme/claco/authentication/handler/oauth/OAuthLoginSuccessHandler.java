@@ -65,6 +65,8 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
 			.build();
 
 		response.setHeader("Set-Cookie", cookie.toString());
+		response.setHeader("Access-Control-Allow-Origin", frontUrl);
+		response.setHeader("Access-Control-Allow-Credentials", "true");
 
 		String redirectUrl = frontUrl + "/oauth/callback/main?token=" +
 			URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
