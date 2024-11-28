@@ -77,7 +77,7 @@ import org.springframework.web.bind.annotation.RestController;
     }
 
 
-    @GetMapping("/queries")
+        @GetMapping("/queries")
         @Operation(summary = "공연 둘러보기 검색하기", description = "기능명세서 화면번호 4.1.0")
         @Parameter(name = "direction", description = "정렬 순서", example = "asc/dsc")
         @Parameter(name = "query", description = "검색어", required = true)
@@ -90,6 +90,20 @@ import org.springframework.web.bind.annotation.RestController;
             Pageable pageable = PageRequest.of(page - 1, size);
             return ApiResponse.ok(concertService.getSearchConcert(query,direction, pageable));
         }
+
+        @GetMapping("/reviews/queries")
+        @Operation(summary = "공연 둘러보기 검색하기-리뷰버전", description = "기능명세서 화면번호 4.1.0")
+        @Parameter(name = "direction", description = "정렬 순서", example = "asc/dsc")
+        @Parameter(name = "query", description = "검색어", required = true)
+        public ApiResponse<PageResponse<ConcertResponse>> searchConcertsV2(
+        @RequestParam("query") String query,
+        @RequestParam(value = "direction", defaultValue = "asc") String direction,
+        @RequestParam("page") int page,
+        @RequestParam(value = "size", defaultValue = "9") int size) {
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return ApiResponse.ok(concertService.getSearchConcertV2(query,direction, pageable));
+    }
 
         @GetMapping("/details/{concertId}")
         @Operation(summary = "공연 상세보기", description = "기능명세서 화면번호 3.0.0")
@@ -125,6 +139,14 @@ import org.springframework.web.bind.annotation.RestController;
             ){
                 return ApiResponse.ok(concertService.getAutoComplete(query));
             }
+
+        @GetMapping("/reviews/search")
+        @Operation(summary = "자동완성 API-리뷰버전", description = "자동완성 기능으로 10개의 공연을 반환")
+        public ApiResponse<List<ConcertAutoCompleteResponse>> autoCompletesV2(
+            @RequestParam("query") String query
+        ){
+            return ApiResponse.ok(concertService.getAutoCompleteV2(query));
+        }
 
         @GetMapping("/posters")
         @Operation(summary = "KOPIS Poster", description = "Kopis API Poster 다운로드")

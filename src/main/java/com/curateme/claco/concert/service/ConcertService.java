@@ -19,6 +19,8 @@ public interface ConcertService {
 
     PageResponse<ConcertResponse> getSearchConcert(String query, String direction, Pageable pageable);
 
+    PageResponse<ConcertResponse> getSearchConcertV2(String query, String direction, Pageable pageable);
+    
     ConcertDetailResponse getConcertDetailWithCategories(Long concertId);
 
     String postLikes(Long concertId);
@@ -28,4 +30,6 @@ public interface ConcertService {
     List<ConcertAutoCompleteResponse> getAutoComplete(String query);
 
     String getS3PosterUrl(String KopisURL);
+
+    List<ConcertAutoCompleteResponse> getAutoCompleteV2(String query);
 }

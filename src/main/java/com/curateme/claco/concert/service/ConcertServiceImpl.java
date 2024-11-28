@@ -191,6 +191,44 @@ public class ConcertServiceImpl implements ConcertService {
             .build();
     }
 
+    @Override
+    public PageResponse<ConcertResponse> getSearchConcertV2(String query, String direction, Pageable pageable) {
+
+        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by("prfpdfrom").ascending() : Sort.by("prfpdfrom").descending();
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+        Page<Concert> concertPage = concertRepository.findBySearchQueryV2(query, sortedPageable);
+
+        List<ConcertResponse> concertResponses;
+
+        if (concertPage.isEmpty()) { // `concertPage`가 비어 있는 경우 처리
+            List<RecommendationConcertsResponseV1> recommendationConcertsResponseV1s = recommendationServiceImpl.getConcertRecommendations(3);
+            concertResponses = List.of(ConcertResponse.fromRecommendations(recommendationConcertsResponseV1s));
+        } else {
+            concertResponses = concertPage.getContent().stream()
+                .map(concert -> {
+                    List<Long> categoryIds = concertCategoryRepository.findCategoryIdsByCategoryName(concert.getId());
+                    List<Category> categories = categoryRepository.findAllById(categoryIds);
+
+                    List<ConcertCategoryResponse> categoryResponses = categories.stream()
+                        .map(category -> new ConcertCategoryResponse(category.getCategory(), category.getImageUrl()))
+                        .collect(Collectors.toList());
+
+                    return ConcertResponse.fromEntity(concert, categoryResponses, null);
+                })
+                .collect(Collectors.toList());
+        }
+
+        // PageResponse 생성
+        return PageResponse.<ConcertResponse>builder()
+            .listPageResponse(concertResponses)
+            .totalCount(concertPage.getTotalElements())
+            .size(concertPage.getSize())
+            .totalPage(concertPage.getTotalPages())
+            .currentPage(concertPage.getPageable().getPageNumber()+1)
+            .build();
+    }
+
 
     @Override
     public ConcertDetailResponse getConcertDetailWithCategories(Long concertId) {
@@ -277,6 +315,19 @@ public class ConcertServiceImpl implements ConcertService {
     public List<ConcertAutoCompleteResponse> getAutoComplete(String query) {
 
         List<Long> concertIds = concertRepository.findConcertIdsBySearchQuery(query);
+        List<Long> topConcertIds = concertIds.size() > 10 ? concertIds.subList(0, 10) : concertIds;
+
+        List<Concert> concerts = concertRepository.findAllById(topConcertIds);
+
+        return concerts.stream()
+            .map(ConcertAutoCompleteResponse::fromEntity)
+            .toList();
+    }
+
+    @Override
+    public List<ConcertAutoCompleteResponse> getAutoCompleteV2(String query) {
+
+        List<Long> concertIds = concertRepository.findConcertIdsBySearchQueryV2(query);
         List<Long> topConcertIds = concertIds.size() > 10 ? concertIds.subList(0, 10) : concertIds;
 
         List<Concert> concerts = concertRepository.findAllById(topConcertIds);
