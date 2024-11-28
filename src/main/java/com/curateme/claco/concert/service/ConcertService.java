@@ -19,8 +19,6 @@ public interface ConcertService {
 
     PageResponse<ConcertResponse> getSearchConcert(String query, String direction, Pageable pageable);
 
-    PageResponse<ConcertResponse> getSearchConcertV2(String query, String direction, Pageable pageable);
-    
     ConcertDetailResponse getConcertDetailWithCategories(Long concertId);
 
     String postLikes(Long concertId);
