@@ -156,6 +156,7 @@ public class RecommendationServiceImpl implements RecommendationService{
                     .orElse(null);
 
                 if (ticketReview == null) {
+                    System.out.println("clacoBook.getId() = " + clacoBook.getId());
                     continue;
                 }
 

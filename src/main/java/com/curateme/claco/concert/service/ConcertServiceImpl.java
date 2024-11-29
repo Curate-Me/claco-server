@@ -191,7 +191,6 @@ public class ConcertServiceImpl implements ConcertService {
             .build();
     }
 
-
     @Override
     public ConcertDetailResponse getConcertDetailWithCategories(Long concertId) {
 
@@ -277,6 +276,19 @@ public class ConcertServiceImpl implements ConcertService {
     public List<ConcertAutoCompleteResponse> getAutoComplete(String query) {
 
         List<Long> concertIds = concertRepository.findConcertIdsBySearchQuery(query);
+        List<Long> topConcertIds = concertIds.size() > 10 ? concertIds.subList(0, 10) : concertIds;
+
+        List<Concert> concerts = concertRepository.findAllById(topConcertIds);
+
+        return concerts.stream()
+            .map(ConcertAutoCompleteResponse::fromEntity)
+            .toList();
+    }
+
+    @Override
+    public List<ConcertAutoCompleteResponse> getAutoCompleteV2(String query) {
+
+        List<Long> concertIds = concertRepository.findConcertIdsBySearchQueryV2(query);
         List<Long> topConcertIds = concertIds.size() > 10 ? concertIds.subList(0, 10) : concertIds;
 
         List<Concert> concerts = concertRepository.findAllById(topConcertIds);

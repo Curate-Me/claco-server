@@ -28,4 +28,6 @@ public interface ConcertService {
     List<ConcertAutoCompleteResponse> getAutoComplete(String query);
 
     String getS3PosterUrl(String KopisURL);
+
+    List<ConcertAutoCompleteResponse> getAutoCompleteV2(String query);
 }
