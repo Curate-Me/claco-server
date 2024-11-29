@@ -34,6 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Value("${jwt.cookie.expire}")
 	private Integer COOKIE_EXPIRATION;
+	@Value("${front.url}")
+	private String frontUrl;
 
 	private static String GRANT_TYPE = "Bearer ";
 
@@ -63,9 +65,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 
-			String refreshToken = jwtTokenUtil.extractRefreshToken(request).stream()
-				.findAny()
-				.orElseThrow(() -> new BusinessException(ApiStatus.REFRESH_TOKEN_NOT_FOUND));
+			String refreshToken;
+			if (!frontUrl.contains("localhost")){
+				 refreshToken = jwtTokenUtil.extractRefreshToken(request).stream()
+					.findAny()
+					.orElseThrow(() -> new BusinessException(ApiStatus.REFRESH_TOKEN_NOT_FOUND));
+			}
 
 			response.setHeader("Authorization", GRANT_TYPE + accessToken);
 
