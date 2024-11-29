@@ -26,8 +26,7 @@ public interface ConcertRepository extends JpaRepository<Concert,Long> {
     @Query("SELECT c.id FROM Concert c " +
         "WHERE (:query = 'all' OR c.prfnm LIKE %:query% " +
         "OR c.prfcast LIKE %:query% " +
-        "OR c.fcltynm LIKE %:query%) " +
-        "AND c.prfpdto <= CURRENT_DATE")
+        "OR c.fcltynm LIKE %:query%) ")
     List<Long> findConcertIdsBySearchQueryV2(@Param("query") String query);
 
     @Query("SELECT c FROM Concert c WHERE c.id = :concertId")
