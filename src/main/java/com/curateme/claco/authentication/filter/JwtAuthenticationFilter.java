@@ -40,7 +40,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private static String GRANT_TYPE = "Bearer ";
 
 	protected List<String> filterPassList = List.of("/oauth2/authorization/kakao",
-		"/login/oauth2/code/kakao", "/favicon.ico", "/v3/api-docs", "/v3/api-docs/swagger-config", "/health-check");
+		"/login/oauth2/code/kakao", "/favicon.ico", "/v3/api-docs", "/v3/api-docs/swagger-config", "/health-check",
+		"/api/auth"
+	);
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -65,9 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 
-			String refreshToken;
 			if (!frontUrl.contains("localhost")){
-				 refreshToken = jwtTokenUtil.extractRefreshToken(request).stream()
+				 jwtTokenUtil.extractRefreshToken(request).stream()
 					.findAny()
 					.orElseThrow(() -> new BusinessException(ApiStatus.REFRESH_TOKEN_NOT_FOUND));
 			}
@@ -77,7 +78,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		// access token 만료 흐름
 		} catch (ExpiredJwtException e) {
 
-			log.info("[AccessTokenExpire] -> accessToken: {}", accessToken);
+			log.info("[AccessTokenExpire] -> expireMemberId: {}", e.getClaims().get("id"));
 
 			Claims claims = e.getClaims();
 
