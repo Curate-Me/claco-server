@@ -5,7 +5,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -34,8 +33,6 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
 	private final JwtTokenUtil jwtTokenUtil;
 	private final MemberRepository memberRepository;
 
-	@Value("${jwt.cookie.expire}")
-	private Integer COOKIE_EXPIRATION;
 	@Value("${front.url}")
 	private String frontUrl;
 
@@ -52,21 +49,6 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
 		Authentication authentication1 = jwtTokenUtil.createAuthentication(member);
 
 		String accessToken = jwtTokenUtil.generateAccessToken(authentication1);
-		String refreshToken = jwtTokenUtil.generateRefreshToken();
-
-		member.updateRefreshToken(refreshToken);
-
-		ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-			.path("/")
-			.httpOnly(true)
-			.sameSite("None")
-			.maxAge(COOKIE_EXPIRATION)
-			.secure(true)
-			.build();
-
-		response.setHeader("Set-Cookie", cookie.toString());
-		response.setHeader("Access-Control-Allow-Origin", frontUrl);
-		response.setHeader("Access-Control-Allow-Credentials", "true");
 
 		String redirectUrl = frontUrl + "/oauth/callback/main?token=" +
 			URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
