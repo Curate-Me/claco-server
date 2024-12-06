@@ -46,4 +46,6 @@ public interface ClacoBookRepository extends JpaRepository<ClacoBook, Long> {
 	@Query("SELECT tr FROM TicketReview tr WHERE tr.clacoBook.id = :clacoBookId ORDER BY function('RAND')")
 	List<TicketReview> findRandomTicketReviewsByClacoBookId(@Param("clacoBookId") Long clacoBookId);
 
+	@Query("SELECT c FROM ClacoBook c " + "WHERE SIZE(c.ticketReviews) >= 3 " + "ORDER BY function('RAND')")
+	Optional<ClacoBook> findRandomClacoBookWithThreeOrMoreReviews();
 }
