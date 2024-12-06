@@ -146,7 +146,7 @@ public class RecommendationServiceImpl implements RecommendationService{
             List<ClacoBook> clacoBooks = clacoBookRepository.findByMemberId(recUserId);
 
             if (clacoBooks.isEmpty()) {
-                throw new BusinessException(ApiStatus.CLACO_BOOK_NOT_FOUND);
+                continue;
             }
 
             for (ClacoBook clacoBook : clacoBooks) {
@@ -156,9 +156,28 @@ public class RecommendationServiceImpl implements RecommendationService{
                     .orElse(null);
 
                 if (ticketReview == null) {
-                    System.out.println("clacoBook.getId() = " + clacoBook.getId());
                     continue;
                 }
+
+                TicketReviewSummaryResponse ticketReviewSummaryResponse = ticketReviewRepository.findSummaryById(ticketReview.getId());
+
+                TicketInfoResponse ticketInfoResponse = TicketInfoResponse.fromEntity(ticketReview);
+
+                recommendationResponses.add(
+                    RecommendationConcertResponseV2.from(ticketInfoResponse, ticketReviewSummaryResponse)
+                );
+            }
+        }
+
+        if (recommendationResponses.isEmpty()) {
+            ClacoBook randomClacoBook = clacoBookRepository.findRandomClacoBookWithThreeOrMoreReviews()
+                .orElseThrow(() -> new BusinessException(ApiStatus.CLACO_BOOK_NOT_FOUND));
+
+            List<TicketReview> randomTicketReviews = clacoBookRepository.findRandomTicketReviewsByClacoBookId(randomClacoBook.getId());
+
+            int limit = Math.min(3, randomTicketReviews.size());
+            for (int i = 0; i < limit; i++) {
+                TicketReview ticketReview = randomTicketReviews.get(i);
 
                 TicketReviewSummaryResponse ticketReviewSummaryResponse = ticketReviewRepository.findSummaryById(ticketReview.getId());
 
