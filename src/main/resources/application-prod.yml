@@ -12,3 +12,5 @@ spring:
     generate-ddl: false
 front:
   url: ${FRONT_URL}
+backend:
+  domain: ${BACKEND_DOMAIN}

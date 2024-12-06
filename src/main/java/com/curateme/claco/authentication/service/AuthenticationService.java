@@ -29,6 +29,8 @@ public class AuthenticationService {
 	private Integer COOKIE_EXPIRATION;
 	@Value("${front.url}")
 	private String frontUrl;
+	@Value("${backend.domain}")
+	private String backUrl;
 
 	/**
 	 * 리프레시 쿠키 생성
@@ -50,6 +52,7 @@ public class AuthenticationService {
 			.sameSite("None")
 			.maxAge(COOKIE_EXPIRATION)
 			.secure(true)
+			.domain(backUrl)
 			.build();
 
 		response.setHeader("Set-Cookie", cookie.toString());

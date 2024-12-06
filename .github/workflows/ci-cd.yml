@@ -24,6 +24,7 @@ jobs:
       AWS_REGION: 'ap-northeast-2'
       FLASK_SERVER: ${{ secrets.TEST_STRING_ENV }}
       FRONT_URL: ${{ secrets.TEST_STRING_ENV }}
+      BACKEND_DOMAIN: ${{ secrets.TEST_STRING_ENV }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v3

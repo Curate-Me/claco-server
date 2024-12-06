@@ -34,6 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Value("${jwt.cookie.expire}")
 	private Integer COOKIE_EXPIRATION;
+	@Value("${backend.domain}")
+	private String backUrl;
 
 	private final static String GRANT_TYPE = "Bearer ";
 	private final static String COOKIE_REFRESH_URI = "/api/auth/refresh";
@@ -117,6 +119,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				.maxAge(COOKIE_EXPIRATION)
 				.sameSite("None")
 				.secure(true)
+				.domain(backUrl)
 				.build();
 
 			response.setHeader("Set-Cookie", String.valueOf(cookie));
