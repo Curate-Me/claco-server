@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Value("${jwt.cookie.expire}")
 	private Integer COOKIE_EXPIRATION;
-	@Value("${backend.url}")
+	@Value("${backend.domain}")
 	private String backUrl;
 
 	private final static String GRANT_TYPE = "Bearer ";

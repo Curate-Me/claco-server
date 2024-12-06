@@ -29,7 +29,7 @@ public class AuthenticationService {
 	private Integer COOKIE_EXPIRATION;
 	@Value("${front.url}")
 	private String frontUrl;
-	@Value("${backend.url}")
+	@Value("${backend.domain}")
 	private String backUrl;
 
 	/**
