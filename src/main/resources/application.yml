@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: claco
+  profiles:
+    active:
+      - prod
+    group:
+      local:
+        - local
+      prod:
+        - prod
+    include:
+      - oauth
+      - aws
+  servlet:
+    multipart:
+      resolve-lazily: true
+      max-file-size: 15MB
+      max-request-size: 15MB
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+  metrics:
+    tags:
+      application: main-server
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        step: 1m

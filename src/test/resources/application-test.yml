@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mysql:8.0://localhost:3306/test
+    username: root
+    password: password
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    generate-ddl: true
+front:
+  url: ${FRONT_URL}
+backend:
+  domain: ${BACKEND_DOMAIN}

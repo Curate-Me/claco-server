@@ -1,0 +1,89 @@
+name: 'CI/CD'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    env:
+      KAKAO_CLIENT_ID: ${{ secrets.TEST_STRING_ENV }}
+      KAKAO_CLIENT_SECRET: ${{ secrets.TEST_STRING_ENV }}
+      KAKAO_REDIRECT_URI: ${{ secrets.TEST_STRING_ENV }}
+      JWT_SECRET_KEY: ${{ secrets.TEST_JWT_KEY }}
+      JWT_REFRESH_EXPIRE: ${{ secrets.TEST_INT_ENV }}
+      JWT_ACCESS_EXPIRE: ${{ secrets.TEST_INT_ENV }}
+      AWS_BUCKET_NAME: ${{ secrets.TEST_STRING_ENV }}
+      AWS_ACCESS_KEY: ${{ secrets.TEST_STRING_ENV }}
+      AWS_SECRET_KEY: ${{ secrets.TEST_STRING_ENV }}
+      AWS_REGION: 'ap-northeast-2'
+      FLASK_SERVER: ${{ secrets.TEST_STRING_ENV }}
+      FRONT_URL: ${{ secrets.TEST_STRING_ENV }}
+      BACKEND_DOMAIN: ${{ secrets.TEST_STRING_ENV }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon
+
+      - name: Run tests
+        run: ./gradlew test --no-daemon
+
+  CD:
+    if: ${{ github.event_name != 'pull_request' && success() }}
+    needs: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Build
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image
+        run: |
+          docker compose build --no-cache
+          docker tag server ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:server
+          docker tag nginx ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:nginx
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:server
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:nginx
+
+      - name: Deploy
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+  
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:server
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:nginx
+            sudo docker pull prom/prometheus:latest
+            sudo docker pull grafana/grafana:latest
+  
+            sudo docker-compose down
+            sudo docker-compose up -d
+            sudo docker image prune -f

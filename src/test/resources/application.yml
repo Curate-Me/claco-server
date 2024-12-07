@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: claco
+  profiles:
+    active:
+      - test
+    include:
+      - oauth
+      - aws
