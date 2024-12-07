@@ -34,11 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Value("${jwt.cookie.expire}")
 	private Integer COOKIE_EXPIRATION;
-	@Value("${backend.domain}")
-	private String backUrl;
 
 	private final static String GRANT_TYPE = "Bearer ";
-	private final static String COOKIE_REFRESH_URI = "/api/auth/refresh";
 
 	protected List<String> filterPassList = List.of("/oauth2/authorization/kakao",
 		"/login/oauth2/code/kakao", "/favicon.ico", "/v3/api-docs", "/v3/api-docs/swagger-config", "/health-check"
@@ -66,11 +63,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			authentication = jwtTokenUtil.getAuthentication(accessToken);
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
-
-			if (requestUri.equals(COOKIE_REFRESH_URI)) {
-				filterChain.doFilter(request, response);
-				return;
-			}
 
 			jwtTokenUtil.extractRefreshToken(request).stream()
 				.findAny()
@@ -119,7 +111,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				.maxAge(COOKIE_EXPIRATION)
 				.sameSite("None")
 				.secure(true)
-				.domain(backUrl)
 				.build();
 
 			response.setHeader("Set-Cookie", String.valueOf(cookie));
